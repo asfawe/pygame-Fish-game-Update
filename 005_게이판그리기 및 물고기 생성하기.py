@@ -1,0 +1,74 @@
+import pygame as pg
+import random
+
+pg.init()
+
+화면가로길이 = 600
+화면세로길이 = 800
+
+화면 = pg.display.set_mode((화면가로길이, 화면세로길이))
+
+pg.display.set_caption('생선잡기_게임')
+
+배경이미지 = pg.image.load('img/배경.png')
+배경이미지 = pg.transform.scale(배경이미지, (화면가로길이, 화면세로길이))
+화면.blit(배경이미지, (0, 0))
+
+물고기1 = pg.image.load('img/물고기1.png')
+물고기1 = pg.transform.scale(물고기1, (64, 64))
+물고기2 = pg.image.load('img/물고기2.png')
+물고기2 = pg.transform.scale(물고기2, (64, 64))
+
+
+스코어바 = pg.image.load('img/스코어바.png')
+스코어바 = pg.transform.scale(스코어바, (250, 74))
+
+
+시간바 = pg.image.load('img/시간바.png')
+시간바 = pg.transform.scale(시간바, (200, 55))
+
+물고기 = [물고기1, 물고기2]
+전체물고기위치 = []
+
+for 가로 in range(70, 520, 90):
+    pg.draw.line(화면, (255,255,255), (가로, 370), (가로,화면세로길이 - 30), 3)
+    # 아래 for를 중첩하지 않아도 되지만, 물고기의 위치 자표를 얻기위해 for중첩
+    for 세로 in range(370, 화면세로길이-30, 80): # 화면세로길이 800
+        pg.draw.line(화면, (255,255,255), (70, 세로), (520, 세로), 3)
+        전체물고기위치.append((가로+10, 세로+10))
+
+pg.draw.line(화면, (255,255,255), (520, 370), (520,화면세로길이 - 30), 3)  
+pg.draw.line(화면, (255,255,255), (70, 화면세로길이 - 30), (520, 화면세로길이 - 30), 3)
+
+
+물고기위치 = random.sample(전체물고기위치, 5)
+for 위치 in range(5):
+    랜덤물고기 = random.choice(물고기)
+    물고기좌표 = 랜덤물고기.get_rect(topleft=(물고기위치[위치][0], 물고기위치[위치][1]))
+    화면.blit(랜덤물고기, 물고기좌표)
+
+# #             1          2            3        4       5
+# pg.draw.line(화면, (255,255,255), (200,500),(300,500), 10) # 1. 어디에 그릴지 2. 색깔 3. 스타트포지션 4. 엔드표지션 x 자표는 300, y 자표는 200, 5. 윗스는 3
+
+pg.display.update()
+
+폰트 = pg.font.SysFont('hy얕은샘물m', 30, True)
+시작시간 = pg.time.get_ticks()
+잡은물고기 = 0
+
+while True:
+    경과시간 = round((pg.time.get_ticks() - 시작시간) / 1000, 1) # round를 이용해서 소수점 1첫번째 자리까지  소수점을 나타내야하기 때문에 나눈기 1000을 한다. 
+    화면.blit(시간바, (0, 10))
+    화면.blit(스코어바, (350, 2))
+
+    시간 = 폰트.render(f'{경과시간} 초', True, (0,0,0)) # render은 텍스트를 출력할수 있게 하는것이다.
+    화면.blit(시간, (60, 28))
+
+    물고기점수 = 폰트.render(f'{잡은물고기} 마리', True, (0,0,0))
+    화면.blit(물고기점수, (450, 28))
+
+    pg.display.update() # 화면을 건들면 무조건 pg.display.update()를 해줘야 한다.
+
+    for 이벤트 in pg.event.get():
+        if 이벤트.type == pg.QUIT:
+            quit()
